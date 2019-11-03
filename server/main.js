@@ -52,7 +52,8 @@ app.post('/weather/:loc', (req, res) => {
 // any routes not picked up by the server api will be handled by the react router
 app.use('/*', staticFiles)
 
-app.set('port', (process.env.PORT || 3001))
-app.listen(app.get('port'), () => {
-  console.log(`Listening on ${app.get('port')}`)
+const port = process.env.PORT || 3001;
+
+app.listen(port, () => {
+  console.log(`Listening on ${port}`)
 })
