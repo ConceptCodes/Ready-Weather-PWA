@@ -1,0 +1,11 @@
+.video {
+    width: 100vw !important;
+    height: 80vh !important;
+    position: relative;
+    top: 0;
+    left: 0;
+}
+
+.trigger {
+    position: relative;
+}
