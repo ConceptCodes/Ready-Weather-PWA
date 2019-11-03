@@ -4,6 +4,7 @@ const helmet = require('helmet'),
     express = require('express'),
     expressSanitizer = require('express-sanitizer'),
     opencage = require('opencage-api-client');
+    path = require('path'),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
 
@@ -14,6 +15,13 @@ app.use(express.urlencoded({extended: true}));
 app.use(compression());
 app.use(helmet());
 app.use(cors());
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, 'client/build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
 
 // CORS middleware
 const allowCrossDomain = function(req, res, next) {
