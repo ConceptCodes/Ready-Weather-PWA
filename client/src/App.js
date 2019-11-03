@@ -6,6 +6,7 @@ import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import * as tf from '@tensorflow/tfjs'
 
+
 class App extends React.Component {
   constructor() {
     super();
@@ -13,11 +14,11 @@ class App extends React.Component {
     this.updateCity = this.updateCity.bind(this)
     this.componentDidMount = this.componentDidMount.bind(this)
   }
-  async componentDidMount() {
-    const model =  await tf.loadGraphModel('./model.json');
-    console.log(model)
-    this.setState({model})
-  }
+
+    async componentDidMount() {
+       const model = await tf.loadLayersModel('http://localhost:3000/model.json');
+       console.log(model.summary())
+    }
   updateCity = (e) =>{ 
     this.setState({city: e.target.value});
   }

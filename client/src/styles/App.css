@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css?family=McLaren&display=swap');
+
+* {
+  font-family: 'McLaren', cursive;
+}
+
+
 .title {
   font-size: calc(15px + 2vmin);
   color: white;
