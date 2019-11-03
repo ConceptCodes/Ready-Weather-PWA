@@ -1,0 +1,18 @@
+{
+    "name": "main",
+    "version": "1.0.0",
+    "main": "server/main.js",
+    "repository": {},
+    "license": "MIT",
+    "homepage": "https://ready-weather.herokuapp.com",
+    "dependencies": {
+      "concurrently": "^4.0.1",
+      "rimraf": "^2.6.2"
+    },
+    "scripts": {
+      "build": "cd client && yarn build",
+      "install": "(cd client && yarn install) && (cd server && yarn install)",
+      "start": "concurrently \"cd client && PORT=3000 yarn start\" \"cd server && PORT=3001 yarn start\"",
+      "start:prod": "yarn build && cd server && yarn start"
+    }
+}

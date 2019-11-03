@@ -8,20 +8,8 @@ const helmet = require('helmet'),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
 
-    // middleware
-app.use(express.json({type: 'application/json'}));
-app.use(expressSanitizer());
-app.use(express.urlencoded({extended: true}));
-app.use(compression());
-app.use(helmet());
-app.use(cors());
-
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'client/build')));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname+'/client/build/index.html'));
-});
+const staticFiles = express.static(path.join(__dirname, '../client/build'))
+app.use(staticFiles)
 
 // CORS middleware
 const allowCrossDomain = function(req, res, next) {
@@ -32,11 +20,16 @@ const allowCrossDomain = function(req, res, next) {
 }
 
 app.use(allowCrossDomain)
+  
+    // middleware
+app.use(express.json({type: 'application/json'}));
+app.use(expressSanitizer());
+app.use(express.urlencoded({extended: true}));
+app.use(compression());
+app.use(helmet());
+app.use(cors());
 
-// routes
-app.get('/', (req, res) => {
-    return res.sendStatus(202).send('Okay');
-});
+
 
 app.post('/weather/:loc', (req, res) => { 
   //console.log(req.params)
@@ -56,5 +49,10 @@ app.post('/weather/:loc', (req, res) => {
     });
 });
 
-const PORT = 8081 || process.env.PORT;
-app.listen(PORT, () => console.log(`API listening on port ${PORT}!\n`));
+// any routes not picked up by the server api will be handled by the react router
+app.use('/*', staticFiles)
+
+app.set('port', (process.env.PORT || 3001))
+app.listen(app.get('port'), () => {
+  console.log(`Listening on ${app.get('port')}`)
+})

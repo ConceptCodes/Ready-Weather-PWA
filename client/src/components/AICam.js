@@ -8,26 +8,10 @@ import * as tf from '@tensorflow/tfjs'
 let model;
 
 class AICam extends React.Component {
-  setRef = (webcam) => {
+  setRef = webcam => {
     this.webcam = webcam;
   }
 
-  setCanvas =(canvas) => {
-    this.canvas = canvas
-  }
-
-  capture = () => { 
-    let ctx = this.canvas.getContext('2d');
-    let img = new Image()
-    img.onload = function() {;
-      ctx.drawImage(img1, 0, 0);
-    }
-    img.src = this.webcam.getScreenshot();
-    const imageData = ctx.createImageData(img.width, img.height);
-    console.log(ctx.createImageData(img1.width, img1.height))
-  };
-
-  
   Location =()=> {
     if (navigator.geolocation) {
       return navigator.geolocation.getCurrentPosition(this.toCity);
@@ -57,9 +41,12 @@ class AICam extends React.Component {
     return `${loc.coords.latitude}+${loc.coords.longitude}`; 
   }
 
-  predict = (imgElement) => tf.tidy(() => {
+  predict = ()=> tf.tidy(() => {
+    var myImage = new Image();
+    myImage.src = this.webcam.getScreenshot();
+    console.log(this.webcam.getScreenshot());
     // tf.fromPixels() returns a Tensor from an image element.
-    const raw = tf.browser.fromPixels(imgElement).toFloat();
+    const raw = tf.browser.fromPixels(myImage).toFloat();
     const cropped = this.cropImage(raw); 
     const resized = tf.image.resizeBilinear(cropped, [28, 28])
   
@@ -100,7 +87,6 @@ class AICam extends React.Component {
     
     return (
       <div>
-        <canvas ref={this.setCanvas}></canvas>
         <Webcam
           audio={false}
           className="video"
@@ -108,7 +94,7 @@ class AICam extends React.Component {
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
         />
-        <Button className="trigger" size="lg" block onClick={this.capture} variant="dark">Click Me!!</Button>
+        <Button className="trigger" size="lg" block onClick={this.predict} variant="dark">Click Me!!</Button>
       </div>
     );
   }
