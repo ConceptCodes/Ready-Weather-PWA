@@ -62,7 +62,7 @@ class AICam extends React.Component {
         <br></br>
        {
           (this.state.dataUri)
-            ? <ImagePreview city={this.props.city} pred={'hello'} dataUri={this.state.dataUri} />
+            ? <ImagePreview city={this.props.city} pred={this.predict} dataUri={this.state.dataUri} />
             : <Camera onTakePhotoAnimationDone={this.onTakePhotoAnimationDone} />
         }
       </div>
