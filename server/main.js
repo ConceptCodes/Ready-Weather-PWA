@@ -7,8 +7,18 @@ const helmet = require('helmet'),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
 
+
 const staticFiles = express.static(path.join(__dirname, '../client/build'))
 app.use(staticFiles)
+// middleware
+app.use(express.json({type: 'application/json'}));
+app.use(expressSanitizer());
+app.use(express.urlencoded({extended: true}));
+app.use(compression());
+app.use(helmet());
+app.use(cors());
+
+
 
 // CORS middleware
 const allowCrossDomain = function(req, res, next) {
@@ -20,31 +30,25 @@ const allowCrossDomain = function(req, res, next) {
 
 app.use(allowCrossDomain)
   
-    // middleware
-app.use(express.json({type: 'application/json'}));
-app.use(expressSanitizer());
-app.use(express.urlencoded({extended: true}));
-app.use(compression());
-app.use(helmet());
-app.use(cors());
-
-
 
 app.post('/forecast/:city', (req, res) => { 
-  //console.log(req.params)
-    accuweather.getCurrentConditions(city)
+    accuweather.getCurrentConditions(req.params.city)
       .then((result) => {
-        res.json({result})
+        if(result) {
+          res.json({ success: true, data: result} )
+        } else {
+          res.json({success: false, err: 'No Result for that query, Please Try Spelling the Full City Name' })
+        }
       })
-    .catch(error => {
-      console.log('error', error.message);
-    });
+      .catch(error => {
+        res.json({success: false, err: 'No Result for that query, Please Try Spelling the Full City Name' })
+      });
 });
 
 // any routes not picked up by the server api will be handled by the react router
 app.use('/*', staticFiles)
 
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
   console.log(`Listening on ${port}`)

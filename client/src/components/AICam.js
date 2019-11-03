@@ -65,6 +65,8 @@ class AICam extends React.Component {
         <Webcam
           audio={false}
           className="video"
+          width={500}
+          height={500}
           ref={this.setRef}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}

@@ -12,7 +12,11 @@ import Alert from 'react-bootstrap/Alert'
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {city : '', model: null, variant: '', msg: '', show: false}
+    this.state = {city : '', model: null, variant: '', msg: '', show: false, tmp: null}
+    this.toggleAlert = this.toggleAlert.bind(this)
+    this.updateCity = this.updateCity.bind(this)
+    this.presentAlert = this.presentAlert.bind(this)
+    this.GetWeather = this.GetWeather.bind(this)
   }
   async componentDidMount() {
     const model =  await tf.loadGraphModel('../model.json');
@@ -23,17 +27,24 @@ class App extends React.Component {
   }
   GetWeather =()=> {
     if(this.state.city.length > 0) {
-      axios.post(`http://localhost:8081/forecast/${this.state.city}`).then( (res) => {
-        let { data } = res;
-        console.log(data)
+      axios.post(`http://localhost:5000/forecast/${this.state.city}`).then( (res) => {
+        let { success, data, err } = res.data;
+        console.log(res.data)
+       if (success) {
+          let { RealFeel, Temperature, Summary } = data;
+          this.presentAlert('info',`It is ${Temperature} degs and ${Summary} in ${this.state.city}. But it feels more like ${RealFeel} degs!`)
+          this.setState({tmp: data});
+        } else {
+          this.presentAlert('danger', err);
+        } 
       }).catch((err) => console.error(err));
     } else {
-      this.presentAlert('danger','Please actually write something');
+      this.presentAlert('danger','Please Actually Write Something');
     }
   }
   toggleAlert() {
-    let rev = !this.state.show;
-    this.setState({show: rev})
+    let rev = this.state.show;
+    this.setState({show: !rev})
   }
   presentAlert(variant, msg) {
     this.toggleAlert();
@@ -54,17 +65,17 @@ class App extends React.Component {
               onChange={this.updateCity}
             />
             <InputGroup.Append>
-              <Button onClick={this.GetWeather} variant="success">Button</Button>
+              <Button onClick={this.GetWeather} variant="success">Forecast</Button>
             </InputGroup.Append>
           </InputGroup>
             {
               this.state.show ? (
                 <Alert variant={this.state.variant} onClose={this.toggleAlert} dismissible>
-                {this.state.msg}
+                  <strong>{this.state.msg}</strong>
               </Alert>
               ): <></>
           }
-          <AICam model={this.state.model}></AICam>
+          <AICam tmp={this.state.tmp} model={this.state.model}></AICam>
       </div>
     );
   }
