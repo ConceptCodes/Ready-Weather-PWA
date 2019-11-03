@@ -2,20 +2,21 @@ import React from 'react';
 import '../styles/AICam.css'
 import ImagePreview from './ImagePreview'
 import * as tf from '@tensorflow/tfjs'
-import Camera from 'react-html5-camera-photo';
+import Camera, { FACING_MODES } from 'react-html5-camera-photo';
 import 'react-html5-camera-photo/build/css/index.css';
+
 
 class AICam extends React.Component {
   constructor (props, context) {
     super(props, context);
-    this.state = { dataUri: null, image: null };
+    this.state = { dataUri: null, image: null, mode: FACING_MODES.ENVIRONMENT };
     this.onTakePhotoAnimationDone = this.onTakePhotoAnimationDone.bind(this);
+    this.makeImage = this.makeImage.bind(this);
   }
  
   onTakePhotoAnimationDone (dataUri) {
-    console.log('takePhoto');
     this.setState({ dataUri });
-    this.makeImage()
+    console.log(this.makeImage())
   }
  
   componentDidMount() {
@@ -24,39 +25,34 @@ class AICam extends React.Component {
   }
 
   makeImage() {
-    return ImageData({width: 500, height: 500, array: this.convertDataURIToBinary(this.state.dataUri)})
+    let outputSize = 500;
+    let image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = outputSize;
+      canvas.height = outputSize;
+      const context = canvas.getContext('2d');
+      context.drawImage(image, 0, 0, outputSize, outputSize);
+
+      let img =  context.getImageData(0, 0, outputSize, outputSize);
+    };
+    
+    image.src = this.state.dataUri;
+
+    this.predict(image);
   }
   
-  convertDataURIToBinary(dataURI) {
-    let BASE64_MARKER = ';base64,';
-    let base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
-    let base64 = dataURI.substring(base64Index);
-    let raw = window.atob(base64);
-    let rawLength = raw.length;
-    let array = new Uint8Array(new ArrayBuffer(rawLength));
-  
-    for(let i = 0; i < rawLength; i++) 
-      array[i] = raw.charCodeAt(i);
 
-    return array;
-  }
-
-  predict = ()=> tf.tidy(() => {
-    let img = new Image(500, 500).src = this.webcam.getScreenshot();
-    // tf.fromPixels() returns a Tensor from an image element.
-    const raw = tf.browser.fromPixels(img).toFloat();
-    const cropped = this.cropImage(raw); 
-    const resized = tf.image.resizeBilinear(cropped, [28, 28])
-  
-    // Normalize the image from [0, 255] to [-1, 1].
-    const offset = tf.scalar(127);
-    const normalized = resized.sub(offset).div(offset);
-  
-    // Reshape to a single-element batch so we can pass it to predict.
-    const batched = normalized.expandDims(0);
-  
-    // Make a prediction through mobilenet.
-    console.log(this.props.model.predict(batched).dataSync());
+  predict = (img)=> tf.tidy(() => {
+    const raw = tf.browser.fromPixels(this.state.image,1)
+      .reshape([1, 28, 28, 1])
+      .cast('float32')
+      .div(255);
+    
+    let predictionResult =  this.props.model.predict(raw).dataSync();
+    let recognizedClothing = predictionResult.indexOf(Math.max(...predictionResult));
+    let labelNames = ["top", "trouser", "pullover", "dress", "coat", "sandal", "shirt", "sneaker", "bag", "ankle boot"];
+    return labelNames[Math.floor(recognizedClothing)];
   })
 
   Magic(weather,clothes) {
@@ -76,6 +72,7 @@ class AICam extends React.Component {
   render() {
     return (
       <div>
+        <br></br>
        {
           (this.state.dataUri)
             ? <ImagePreview dataUri={this.state.dataUri} />
