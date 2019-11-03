@@ -27,7 +27,7 @@ class App extends React.Component {
   }
   GetWeather =()=> {
     if(this.state.city.length > 0) {
-      axios.post(`http://localhost:5000/forecast/${this.state.city}`).then( (res) => {
+      axios.post(`/forecast/${this.state.city}`).then( (res) => {
         let { success, data, err } = res.data;
         console.log(res.data)
        if (success) {
