@@ -7,6 +7,13 @@ const helmet = require('helmet'),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
 
+function requireHTTPS(req, res, next) {
+  // The 'x-forwarded-proto' check is for Heroku
+  if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV !== "development") {
+    return res.redirect('https://' + req.get('host') + req.url);
+  }
+  next();
+}
 
 const staticFiles = express.static(path.join(__dirname, '../client/build'))
 app.use(staticFiles)
@@ -17,6 +24,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(compression());
 app.use(helmet());
 app.use(cors());
+app.use(requireHTTPS())
 
 
 

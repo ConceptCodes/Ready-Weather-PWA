@@ -6,9 +6,6 @@ class ImagePreview extends React.Component {
     constructor(props){
         super(props);
     }
-    goBack() {
-
-    }
 
     render() {
         return (

@@ -8,13 +8,14 @@ import 'react-html5-camera-photo/build/css/index.css';
 class AICam extends React.Component {
   constructor (props, context) {
     super(props, context);
-    this.state = { dataUri: null };
+    this.state = { dataUri: null, image: null };
     this.onTakePhotoAnimationDone = this.onTakePhotoAnimationDone.bind(this);
   }
  
   onTakePhotoAnimationDone (dataUri) {
     console.log('takePhoto');
     this.setState({ dataUri });
+    this.makeImage()
   }
  
   componentDidMount() {
@@ -22,12 +23,22 @@ class AICam extends React.Component {
     console.log('tmp',this.props.tmp)
   }
 
-  onTakePhoto (dataUri) {
-    this.setState({dataUri, snapped: true})
+  makeImage() {
+    return ImageData({width: 500, height: 500, array: this.convertDataURIToBinary(this.state.dataUri)})
   }
+  
+  convertDataURIToBinary(dataURI) {
+    let BASE64_MARKER = ';base64,';
+    let base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length;
+    let base64 = dataURI.substring(base64Index);
+    let raw = window.atob(base64);
+    let rawLength = raw.length;
+    let array = new Uint8Array(new ArrayBuffer(rawLength));
+  
+    for(let i = 0; i < rawLength; i++) 
+      array[i] = raw.charCodeAt(i);
 
-  onCameraStart (stream) {
-    console.log(stream)
+    return array;
   }
 
   predict = ()=> tf.tidy(() => {
