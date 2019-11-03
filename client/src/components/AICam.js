@@ -1,32 +1,39 @@
 import React from 'react';
-import Webcam from "react-webcam";
 import '../styles/AICam.css'
-import Button from 'react-bootstrap/Button'
+import ImagePreview from './ImagePreview'
 import * as tf from '@tensorflow/tfjs'
-
-let model;
+import Camera from 'react-html5-camera-photo';
+import 'react-html5-camera-photo/build/css/index.css';
 
 class AICam extends React.Component {
-  setRef = webcam => {
-    this.webcam = webcam;
+  constructor (props, context) {
+    super(props, context);
+    this.state = { dataUri: null };
+    this.onTakePhotoAnimationDone = this.onTakePhotoAnimationDone.bind(this);
+  }
+ 
+  onTakePhotoAnimationDone (dataUri) {
+    console.log('takePhoto');
+    this.setState({ dataUri });
+  }
+ 
+  componentDidMount() {
+    console.log('model',this.props.model)
+    console.log('tmp',this.props.tmp)
   }
 
-  cropImage = (img) => {
-    const size = Math.min(img.shape[0], img.shape[1]);
-    const centerHeight = img.shape[0] / 2;
-    const beginHeight = centerHeight - (size / 2);
-    const centerWidth = img.shape[1] / 2;
-    const beginWidth = centerWidth - (size / 2);
-    return img.slice([beginHeight, beginWidth, 0], [size, size, 3]);
+  onTakePhoto (dataUri) {
+    this.setState({dataUri, snapped: true})
   }
 
-  
+  onCameraStart (stream) {
+    console.log(stream)
+  }
+
   predict = ()=> tf.tidy(() => {
-    var myImage = new Image();
-    myImage.src = this.webcam.getScreenshot();
-    console.log(this.webcam.getScreenshot());
+    let img = new Image(500, 500).src = this.webcam.getScreenshot();
     // tf.fromPixels() returns a Tensor from an image element.
-    const raw = tf.browser.fromPixels(myImage).toFloat();
+    const raw = tf.browser.fromPixels(img).toFloat();
     const cropped = this.cropImage(raw); 
     const resized = tf.image.resizeBilinear(cropped, [28, 28])
   
@@ -56,22 +63,13 @@ class AICam extends React.Component {
   }
 
   render() {
-    const videoConstraints = {
-      facingMode: "environment"
-    };
-    
     return (
       <div>
-        <Webcam
-          audio={false}
-          className="video"
-          width={500}
-          height={500}
-          ref={this.setRef}
-          screenshotFormat="image/jpeg"
-          videoConstraints={videoConstraints}
-        />
-        <Button className="trigger" size="lg" block onClick={this.predict} variant="dark">Click Me!!</Button>
+       {
+          (this.state.dataUri)
+            ? <ImagePreview dataUri={this.state.dataUri} />
+            : <Camera onTakePhotoAnimationDone={this.onTakePhotoAnimationDone} />
+        }
       </div>
     );
   }

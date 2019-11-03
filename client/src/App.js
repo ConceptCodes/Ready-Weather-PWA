@@ -19,8 +19,9 @@ class App extends React.Component {
     this.GetWeather = this.GetWeather.bind(this)
   }
   async componentDidMount() {
-    const model =  await tf.loadGraphModel('../model.json');
+    const model =  await tf.loadGraphModel('./model.json');
     this.setState({model})
+    console.log(model)
   }
   updateCity = (e) =>{ 
     this.setState({city: e.target.value});
@@ -47,8 +48,7 @@ class App extends React.Component {
     this.setState({show: !rev})
   }
   presentAlert(variant, msg) {
-    this.toggleAlert();
-    this.setState({ variant, msg})
+    this.setState({show: true, variant, msg})
   }
   render() {
     return (
