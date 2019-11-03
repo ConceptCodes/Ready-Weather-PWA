@@ -4,8 +4,6 @@ const helmet = require('helmet'),
     express = require('express'),
     expressSanitizer = require('express-sanitizer'),
     path = require('path'),
-    fs = require("fs"),
-    https = require("https"),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
 
@@ -48,11 +46,7 @@ app.post('/forecast/:city', (req, res) => {
 app.use('/*', staticFiles)
 
 const port = process.env.PORT || 5000;
- 
-https.createServer({
-  key: fs.readFileSync(path.join(__dirname,'server.key')),
-  cert: fs.readFileSync(path.join(__dirname,'server.cert'))
-}, app)
-.listen(port, () => {
+
+app.listen(port, () => {
   console.log('App is Alive BABY!!!')
 })

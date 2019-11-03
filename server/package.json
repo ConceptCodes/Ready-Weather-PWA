@@ -9,7 +9,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon main.js",
-    "genKey": "openssl req -nodes -new -x509 -keyout server.key -out server.cert",
     "start": "node main.js"
   },
   "author": "ConceptCodes",
