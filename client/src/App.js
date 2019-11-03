@@ -5,14 +5,39 @@ import Navbar from 'react-bootstrap/Navbar'
 import InputGroup from 'react-bootstrap/InputGroup'
 import FormControl from 'react-bootstrap/FormControl'
 import Button from 'react-bootstrap/Button'
+import axios from 'axios'
+import * as tf from '@tensorflow/tfjs'
+import Alert from 'react-bootstrap/Alert'
 
 class App extends React.Component {
   constructor() {
     super();
-    this.state = {city : ''}
+    this.state = {city : '', model: null, variant: '', msg: '', show: false}
+  }
+  async componentDidMount() {
+    const model =  await tf.loadGraphModel('../model.json');
+    this.setState({model})
   }
   updateCity = (e) =>{ 
     this.setState({city: e.target.value});
+  }
+  GetWeather =()=> {
+    if(this.state.city.length > 0) {
+      axios.post(`http://localhost:8081/forecast/${this.state.city}`).then( (res) => {
+        let { data } = res;
+        console.log(data)
+      }).catch((err) => console.error(err));
+    } else {
+      this.presentAlert('danger','Please actually write something');
+    }
+  }
+  toggleAlert() {
+    let rev = !this.state.show;
+    this.setState({show: rev})
+  }
+  presentAlert(variant, msg) {
+    this.toggleAlert();
+    this.setState({ variant, msg})
   }
   render() {
     return (
@@ -20,9 +45,8 @@ class App extends React.Component {
           <Navbar bg="primary" variant="dark">
               <h1 className="title">Ready Weather</h1>
           </Navbar>
-          <InputGroup className="mb-3">
+          <InputGroup size="lg" className="mb-3">
             <FormControl
-              as="input"
               placeholder="Enter your City"
               aria-label="Enter your City"
               aria-describedby="basic-addon2"
@@ -30,10 +54,17 @@ class App extends React.Component {
               onChange={this.updateCity}
             />
             <InputGroup.Append>
-              <Button variant="success">Button</Button>
+              <Button onClick={this.GetWeather} variant="success">Button</Button>
             </InputGroup.Append>
           </InputGroup>
-          <AICam></AICam>
+            {
+              this.state.show ? (
+                <Alert variant={this.state.variant} onClose={this.toggleAlert} dismissible>
+                {this.state.msg}
+              </Alert>
+              ): <></>
+          }
+          <AICam model={this.state.model}></AICam>
       </div>
     );
   }

@@ -3,7 +3,6 @@ const helmet = require('helmet'),
     cors = require('cors'),
     express = require('express'),
     expressSanitizer = require('express-sanitizer'),
-    opencage = require('opencage-api-client');
     path = require('path'),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
@@ -31,19 +30,12 @@ app.use(cors());
 
 
 
-app.post('/weather/:loc', (req, res) => { 
+app.post('/forecast/:city', (req, res) => { 
   //console.log(req.params)
-  opencage
-    .geocode({q: req.params.loc})
-      .then(data => {
-        //console.log(data)
-        /*
-        accuweather.getCurrentConditions(city)
-          .then((result) => {
-            res.json({result})
-          });   
-          */
-    })
+    accuweather.getCurrentConditions(city)
+      .then((result) => {
+        res.json({result})
+      })
     .catch(error => {
       console.log('error', error.message);
     });

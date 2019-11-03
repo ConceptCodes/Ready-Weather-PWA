@@ -2,7 +2,6 @@ import React from 'react';
 import Webcam from "react-webcam";
 import '../styles/AICam.css'
 import Button from 'react-bootstrap/Button'
-import axios from 'axios'
 import * as tf from '@tensorflow/tfjs'
 
 let model;
@@ -10,14 +9,6 @@ let model;
 class AICam extends React.Component {
   setRef = webcam => {
     this.webcam = webcam;
-  }
-
-  Location =()=> {
-    if (navigator.geolocation) {
-      return navigator.geolocation.getCurrentPosition(this.toCity);
-    } else {
-      console.error("Geolocation is not supported by this browser.");
-    }
   }
 
   cropImage = (img) => {
@@ -29,18 +20,7 @@ class AICam extends React.Component {
     return img.slice([beginHeight, beginWidth, 0], [size, size, 3]);
   }
 
-  GetWeather =()=> {
-    //console.log(Location())
-    axios.post(`http://localhost:8081/weather/${Location()}`).then( (res) => {
-      let { data } = res;
-      console.log(data)
-    }).catch((err) => console.error(err));
-  }
   
-  toCity =(loc)=> {
-    return `${loc.coords.latitude}+${loc.coords.longitude}`; 
-  }
-
   predict = ()=> tf.tidy(() => {
     var myImage = new Image();
     myImage.src = this.webcam.getScreenshot();
@@ -58,7 +38,7 @@ class AICam extends React.Component {
     const batched = normalized.expandDims(0);
   
     // Make a prediction through mobilenet.
-    console.log(model.predict(batched).dataSync());
+    console.log(this.props.model.predict(batched).dataSync());
   })
 
   Magic(weather,clothes) {
@@ -73,11 +53,6 @@ class AICam extends React.Component {
       return cClothes.includes(clothes)
     }
 
-  }
-  
-  async componentDidMount() {
-    model =  await tf.loadGraphModel('../model.json');
-    console.log('Model is Loaded')
   }
 
   render() {
