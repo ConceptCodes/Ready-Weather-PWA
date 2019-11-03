@@ -32,7 +32,7 @@ class AICam extends React.Component {
     const raw = tf.browser.fromPixels(this.state.image,1)
       .reshape([1, 28, 28, 1])
       .cast('float32')
-      .div(255);
+      .div(tf.scalar(255));
     
     let predictionResult =  this.props.model.predict(raw).dataSync();
     console.log(predictionResult);
