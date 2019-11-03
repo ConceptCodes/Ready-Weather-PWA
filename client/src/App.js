@@ -16,8 +16,8 @@ class App extends React.Component {
   }
 
     async componentDidMount() {
-       const model = await tf.loadLayersModel('http://localhost:3000/model.json');
-       console.log(model.summary())
+       const model = await tf.loadLayersModel('https://ready-weather.herokuapp.com/model.json');
+       console.log(model)
     }
   updateCity = (e) =>{ 
     this.setState({city: e.target.value});

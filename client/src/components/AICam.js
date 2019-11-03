@@ -12,16 +12,11 @@ class AICam extends React.Component {
     this.state = { dataUri: null, image: null, mode: FACING_MODES.ENVIRONMENT };
     this.onTakePhotoAnimationDone = this.onTakePhotoAnimationDone.bind(this);
     this.makeImage = this.makeImage.bind(this);
+    console.log(this.props.model)
   }
  
   onTakePhotoAnimationDone (dataUri) {
-    this.setState({ dataUri });
-    console.log(this.makeImage())
-  }
- 
-  componentDidMount() {
-    console.log('model',this.props.model)
-    console.log('tmp',this.props.tmp)
+    this.setState({ dataUri })
   }
 
   makeImage() {
