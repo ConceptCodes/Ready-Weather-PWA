@@ -15,6 +15,6 @@
     "scripts": {
       "build": "cd client && yarn build",
       "install": "(cd client && yarn install) && (cd server && yarn install)",
-      "start": "yarn build && cd server && yarn start"
+      "start": "cd server && yarn start"
     }
 }
