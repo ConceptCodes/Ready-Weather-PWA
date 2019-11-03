@@ -39,7 +39,7 @@ class AICam extends React.Component {
     
     image.src = this.state.dataUri;
 
-    this.predict(image);
+    //this.predict(image);
   }
   
 
@@ -75,7 +75,7 @@ class AICam extends React.Component {
         <br></br>
        {
           (this.state.dataUri)
-            ? <ImagePreview dataUri={this.state.dataUri} />
+            ? <ImagePreview city={this.props.city} dataUri={this.state.dataUri} />
             : <Camera onTakePhotoAnimationDone={this.onTakePhotoAnimationDone} />
         }
       </div>
