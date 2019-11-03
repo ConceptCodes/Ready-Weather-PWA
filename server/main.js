@@ -49,10 +49,6 @@ app.use('/*', staticFiles)
 
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
-  console.log(`Listening on ${port}`)
-})
-
 https.createServer({
   key: fs.readFileSync(path.join(__dirname,'server.key')),
   cert: fs.readFileSync(path.join(__dirname,'server.cert'))
