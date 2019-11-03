@@ -30,7 +30,6 @@ class App extends React.Component {
     if(this.state.city.length > 0) {
       axios.post(`/forecast/${this.state.city}`).then( (res) => {
         let { success, data, err } = res.data;
-        console.log(res.data)
        if (success) {
           let { RealFeel, Temperature, Summary } = data;
           this.presentAlert('info',`It is ${Temperature} degs and ${Summary} in ${this.state.city}. But it feels more like ${RealFeel} degs!`)
