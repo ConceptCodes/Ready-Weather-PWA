@@ -48,7 +48,7 @@ app.post('/forecast/:city', (req, res) => {
 app.use('/*', staticFiles)
 
 const port = process.env.PORT || 5000;
-
+ 
 https.createServer({
   key: fs.readFileSync(path.join(__dirname,'server.key')),
   cert: fs.readFileSync(path.join(__dirname,'server.cert'))
