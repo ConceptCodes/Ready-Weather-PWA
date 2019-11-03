@@ -4,16 +4,10 @@ const helmet = require('helmet'),
     express = require('express'),
     expressSanitizer = require('express-sanitizer'),
     path = require('path'),
+    fs = require("fs"),
+    https = require("https"),
     accuweather = require('node-accuweather')()('dqxWjSitjpLHtbPmPrktipvE8RaLvnUQ'),
     app = express();
-
-function requireHTTPS(req, res, next) {
-  // The 'x-forwarded-proto' check is for Heroku
-  if (!req.secure && req.get('x-forwarded-proto') !== 'https') {
-    return res.redirect('https://' + req.get('host') + req.url);
-  }
-  next();
-}
 
 const staticFiles = express.static(path.join(__dirname, '../client/build'))
 app.use(staticFiles)
@@ -24,9 +18,6 @@ app.use(express.urlencoded({extended: true}));
 app.use(compression());
 app.use(helmet());
 app.use(cors());
-app.use(requireHTTPS())
-
-
 
 // CORS middleware
 const allowCrossDomain = function(req, res, next) {
@@ -60,4 +51,12 @@ const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
   console.log(`Listening on ${port}`)
+})
+
+https.createServer({
+  key: fs.readFileSync(path.join(__dirname,'server.key')),
+  cert: fs.readFileSync(path.join(__dirname,'server.cert'))
+}, app)
+.listen(port, () => {
+  console.log('App is Alive BABY!!!')
 })
