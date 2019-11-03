@@ -1,5 +1,9 @@
 .title {
   font-size: calc(15px + 2vmin);
   color: white;
+  padding-top: 12px;
 }
 
+#App {
+  height: 100vh;
+}

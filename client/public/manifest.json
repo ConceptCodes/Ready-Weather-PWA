@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Ready Weather",
+  "name": "a simple project for hackpsu",
   "icons": [
     {
       "src": "favicon.ico",
